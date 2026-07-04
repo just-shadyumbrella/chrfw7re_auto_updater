@@ -1,0 +1,26 @@
+name: Compile NSIS Script (GitHub Actions)
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 🏗️  Checkout code
+        uses: actions/checkout@v4
+
+      - name: 💾 Install NSIS
+        uses: joncloud/makensis-action@v5.0
+        with:
+          arguments: "/V3"
+
+      - name: 📦 Create installer
+        run: |
+          mkdir out
+          makensis src\updater.nsi
+
+      - name: 📤 Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Updater-Installer
+          path: out/updater.exe

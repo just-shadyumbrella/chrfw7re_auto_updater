@@ -10,17 +10,24 @@
 !define ChromiumInstallPath "$LOCALAPPDATA\Chromium\Application"
 
 Name ${NAME}
-BrandingText ""
+BrandingText " "
 OutFile "..\out\updater.exe"
 Icon updater.ico
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
-ShowInstDetails show
+AutoCloseWindow true
 
 # Just user /S as silent updater
 !define MUI_ICON updater.ico
+!define MUI_ABORTWARNING
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW InstFilesShow
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_LANGUAGE English
+
+Function InstFilesShow
+	GetDlgItem $0 $HWNDPARENT 2
+	EnableWindow $0 1
+FunctionEnd
 
 Var CommandArgs
 Var BinaryVersion
@@ -120,4 +127,14 @@ Section
 	nsExec::Exec "update.exe"
 
 	Finish:
+	GetDlgItem $0 $HWNDPARENT 1
+	EnableWindow $0 1
+	GetDlgItem $0 $HWNDPARENT 2
+	EnableWindow $0 0
+	DetailPrint "Auto close in 3..."
+	Sleep 1000
+	DetailPrint "Auto close in 2..."
+	Sleep 1000
+	DetailPrint "Auto close in 1..."
+	Sleep 1000
 SectionEnd
