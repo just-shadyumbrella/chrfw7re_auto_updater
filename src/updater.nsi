@@ -57,7 +57,7 @@ Section
 	File ..\bin\jq.exe
 
 	${GetParameters} $CommandArgs
-	${GetOptions} "$CommandArgs" "--channel=" $Channel
+	${GetOptions} "$CommandArgs" "/channel=" $Channel
 
 	${If} $Channel == "beta"
 		DetailPrint "Channel: Beta"
@@ -104,7 +104,7 @@ Section
 		IntOp $Index $Index + 1
 	${LoopUntil} $BrowserDownloadUrl == ""
 
-	${GetOptions} "$CommandArgs" "--force" $R0
+	${GetOptions} "$CommandArgs" "/force" $R0
 
 	${IfNot} ${Errors}
 		DetailPrint "Forced install: Removing current Chromium installation..."
