@@ -87,7 +87,11 @@ Section
 
 	${If} $R0 == $BinaryVersion
 		DetailPrint "${NAME} is up to date."
-		Goto Finish
+		${GetOptions} "$CommandArgs" "/force" $R0
+
+		${If} ${Errors}
+			Goto Finish
+		${EndIf}
 	${EndIf}
 
 	${If} ${RunningX64}
@@ -111,18 +115,27 @@ Section
 		IntOp $Index $Index + 1
 	${LoopUntil} $BrowserDownloadUrl == ""
 
-	${GetOptions} "$CommandArgs" "/force" $R0
-
-	${IfNot} ${Errors}
-		DetailPrint "Forced install: Removing current Chromium installation..."
-		ReadRegStr $R0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Chromium" "UninstallString"
-		ExecWait "$R0 --force-uninstall"
-	${EndIf}
-
 	; ExecWait "explorer.exe ."
 
 	DetailPrint "Downloading update..."
 	nsExec::Exec "aria2c.exe --conf-path=aria2.conf $BrowserDownloadUrl -o update.exe"
+
+	${GetOptions} "$CommandArgs" "/force" $R0
+
+	${IfNot} ${Errors}
+		DetailPrint "Forced install: Removing current Chromium installation..."
+		${GetOptions} "$CommandArgs" "/clearuserdata" $R1
+
+		${IfNot} ${Errors}
+			DetailPrint "Forced install: With user data..."
+			StrCpy $R1 " --delete-profile"
+		${EndIf}
+
+		ReadRegStr $R0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Chromium" "UninstallString"
+		ExecWait "$R0 --force-uninstall$R1"
+	${EndIf}
+
+	Sleep 10000
 	DetailPrint "Installing update..."
 	nsExec::Exec "update.exe"
 
