@@ -9,6 +9,7 @@ Just NSIS based automatic updater for [Chromium-for-windows-7-REWORK](https://gi
 
 ## External Bundled Tools
 
+- [curl](https://github.com/lordmulder/cURL-build-win32) (32 bit version for legacy Windows)
 - [aria2](https://github.com/aria2/aria2) (For multithreaded downloading)
 - [jq](https://github.com/jqlang/jq) (For parsing JSON)
 
@@ -25,6 +26,9 @@ updater.exe /channel=beta
 
 # Force install (will uninstall current)
 updater.exe /force
+
+# Force install and remove user data
+updater.exe /force /clearuserdata
 ```
 
 You also can manually register autorun or task scheduler.

@@ -61,6 +61,7 @@ Section
 
 	File ..\bin\aria2.conf
 	File ..\bin\aria2c.exe
+	File ..\bin\curl.exe
 	File ..\bin\jq.exe
 
 	${GetParameters} $CommandArgs
@@ -75,7 +76,15 @@ Section
 	${EndIf}
 
 	DetailPrint "Fetching: $Sources"
-	nsExec::Exec "aria2c.exe --conf-path=aria2.conf $Sources -o sources.json"
+	nsExec::ExecToStack /OEM "aria2c.exe --conf-path=aria2.conf $Sources -o sources.json"
+	Pop $R0
+
+	${If} $R0 != 0
+		nsExec::Exec "curl $Sources -o sources.json"
+		!insertmacro jq "sources.json" ".message" $R0 $R1
+		MessageBox MB_ICONSTOP $R0
+		Goto Finish
+	${EndIf}
 
 	${If} $Channel == "beta"
 		StrCpy $Prefix ".[0]"
@@ -132,7 +141,7 @@ Section
 		${EndIf}
 
 		ReadRegStr $R0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Chromium" "UninstallString"
-		ExecWait "$R0 --force-uninstall$R1"
+		nsExec::Exec "$R0 --force-uninstall$R1"
 	${EndIf}
 
 	Sleep 10000
