@@ -78,8 +78,19 @@ Section
 	DetailPrint "Fetching: $Sources"
 	nsExec::ExecToStack /OEM "aria2c.exe --conf-path=aria2.conf $Sources -o sources.json"
 	Pop $R0
+	Pop $R1
 
 	${If} $R0 != 0
+		${GetOptions} "$CommandArgs" "/S" $R0
+
+		${IfNot} ${Errors}
+			Goto Finish
+		${EndIf}
+
+		${If} $R1 != ""
+			MessageBox MB_ICONSTOP $R1
+		${EndIf}
+
 		nsExec::Exec "curl $Sources -o sources.json"
 		!insertmacro jq "sources.json" ".message" $R0 $R1
 		MessageBox MB_ICONSTOP $R0
@@ -153,6 +164,7 @@ Section
 	EnableWindow $0 1
 	GetDlgItem $0 $HWNDPARENT 2
 	EnableWindow $0 0
+	Sleep 1000
 	DetailPrint "Auto close in 3..."
 	Sleep 1000
 	DetailPrint "Auto close in 2..."
